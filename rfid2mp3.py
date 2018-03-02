@@ -29,11 +29,14 @@ music = pygame.mixer.music
 
 #play song
 def TagToMplayer (strTag, arg=0):
-    strLocation = ConfigSectionMap(strTag)['location']
-    print(strLocation)
-    music.load(strLocation)
-    music.play(loops=-1)
-    
+    try:
+        strLocation = ConfigSectionMap(strTag)['location']
+        print(strLocation)
+        music.load(strLocation)
+        music.play(loops=-1)
+    except:
+        pass
+
 continue_reading = True
 MIFAREReader = MFRC522.MFRC522()
 
@@ -65,17 +68,14 @@ while continue_reading:
     if i > 1:
         music.pause()
         detected = False
-    
+
     (status,backData) = MIFAREReader.MFRC522_Anticoll()
     if status == MIFAREReader.MI_OK:
         #tag detected decision tree
-        strbackData = to_string(backData) 
-    if strbackData != currently_playing:
-        currently_playing = strbackData
-        TagToMplayer(strbackData)
-    elif not detected:
-        music.unpause()
-    detected = True
-
-
-
+        strbackData = to_string(backData)
+        if strbackData != currently_playing:
+            currently_playing = strbackData
+            TagToMplayer(strbackData)
+        elif not detected:
+            music.unpause()
+        detected = True
