@@ -8,7 +8,7 @@ import pygame
 Config = ConfigParser.ConfigParser()
 Config.read("/home/pi/MFRC522-python/rfidconfig.txt")
 
-# From https://wiki.python.org/moin/ConfigParserExamples
+#from https://wiki.python.org/moin/ConfigParserExamples
 def ConfigSectionMap(section):
     dict1 = {}
     options = Config.options(section)
@@ -31,7 +31,6 @@ music = pygame.mixer.music
 def TagToMplayer (strTag, arg=0):
     try:
         strLocation = ConfigSectionMap(strTag)['location']
-        print(strLocation)
         music.load(strLocation)
         music.play(loops=-1)
     except:
@@ -49,7 +48,7 @@ def end_read(signal, frame):
 
 signal.signal(signal.SIGINT, end_read)
 
-def to_string(backData):
+def ToString(backData):
     return str(backData).replace(']','').replace('[','').replace(' ', '')
 
 #setting vars
@@ -63,17 +62,18 @@ while continue_reading:
     (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
     if status == MIFAREReader.MI_OK:
         i = 0
-    else:
+    elif i < 2:
         i += 1
-    if i > 1:
+    else:
         music.pause()
         detected = False
 
     (status,backData) = MIFAREReader.MFRC522_Anticoll()
     if status == MIFAREReader.MI_OK:
         #tag detected decision tree
-        strbackData = to_string(backData)
+        strbackData = ToString(backData)
         if strbackData != currently_playing:
+            print(strbackData)
             currently_playing = strbackData
             TagToMplayer(strbackData)
         elif not detected:
